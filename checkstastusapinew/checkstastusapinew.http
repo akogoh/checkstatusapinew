@@ -1,0 +1,6 @@
+@checkstastusapinew_HostAddress = http://localhost:5278
+
+GET {{checkstastusapinew_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
