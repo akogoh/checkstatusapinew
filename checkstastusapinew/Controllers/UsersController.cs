@@ -81,7 +81,16 @@ namespace checkstastusapinew.Controllers
                 // Handle image upload if present
                 if (imageFile != null && imageFile.Length > 0)
                 {
-                    var uploadsFolder = @"c:\\Users\\gdakogoh\\source\\repos\\riskdashboardv2\\riskdashboardv2\\UploadedFiles";
+                    string uploadsFolder;
+                    // Use IIS path in production, dev path in development
+                    if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+                    {
+                        uploadsFolder = @"C:\\inetpub\\wwwroot\\checkstastusapinew\\UploadedFiles";
+                    }
+                    else
+                    {
+                        uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
+                    }
                     if (!Directory.Exists(uploadsFolder))
                         Directory.CreateDirectory(uploadsFolder);
                     var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
@@ -90,7 +99,7 @@ namespace checkstastusapinew.Controllers
                     {
                         await imageFile.CopyToAsync(stream);
                     }
-                    // Set the ImageUrls property to the relative path for client access (adjust as needed)
+                    // Set the ImageUrls property to the relative path for client access
                     input.ImageUrls = $"/UploadedFiles/{uniqueFileName}";
                 }
 
