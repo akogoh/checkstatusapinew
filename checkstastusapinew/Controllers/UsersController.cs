@@ -69,7 +69,7 @@ namespace checkstastusapinew.Controllers
         }
         // POST /api/riskdbusers/risk
         [HttpPost("risk")]
-        public async Task<IActionResult> PostRisk([FromForm] RiskInputModel input, [FromForm] Microsoft.AspNetCore.Http.IFormFile imageFile)
+        public async Task<IActionResult> PostRisk([FromForm] checkstastusapinew.Model.RiskInputWithFileDto input)
         {
             if (string.IsNullOrWhiteSpace(input.Directorate))
                 return BadRequest("Directorate is required.");
@@ -79,25 +79,16 @@ namespace checkstastusapinew.Controllers
             try
             {
                 // Handle image upload if present
-                if (imageFile != null && imageFile.Length > 0)
+                if (input.ImageFile != null && input.ImageFile.Length > 0)
                 {
-                    string uploadsFolder;
-                    // Use IIS path in production, dev path in development
-                    if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
-                    {
-                        uploadsFolder = @"C:\\inetpub\\wwwroot\\checkstastusapinew\\UploadedFiles";
-                    }
-                    else
-                    {
-                        uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
-                    }
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
                     if (!Directory.Exists(uploadsFolder))
                         Directory.CreateDirectory(uploadsFolder);
-                    var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                    var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(input.ImageFile.FileName);
                     var filePath = Path.Combine(uploadsFolder, uniqueFileName);
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        await imageFile.CopyToAsync(stream);
+                        await input.ImageFile.CopyToAsync(stream);
                     }
                     // Set the ImageUrls property to the relative path for client access
                     input.ImageUrls = $"/UploadedFiles/{uniqueFileName}";

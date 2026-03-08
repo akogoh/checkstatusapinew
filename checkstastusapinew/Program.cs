@@ -49,10 +49,12 @@ if (!app.Environment.IsDevelopment())
 
 
 // Serve static files from UploadedFiles directory (for image access)
+
+// Serve static files from UploadedFiles directory (relative to app root, works in dev and production)
 app.UseStaticFiles(new Microsoft.AspNetCore.Builder.StaticFileOptions
 {
     FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
-        @"c:\\Users\\gdakogoh\\source\\repos\\riskdashboardv2\\riskdashboardv2\\UploadedFiles"
+        Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles")
     ),
     RequestPath = "/UploadedFiles"
 });
