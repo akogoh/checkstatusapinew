@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -13,7 +14,7 @@ namespace checkstastusapinew.Services
 
         public RiskDbService(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("RiskDatabase") 
+            _connectionString = configuration.GetConnectionString("RiskDatabase")
                 ?? throw new InvalidOperationException("Connection string 'RiskDatabase' not found.");
         }
 
@@ -215,6 +216,74 @@ namespace checkstastusapinew.Services
             await conn.OpenAsync();
             var result = await cmd.ExecuteScalarAsync();
             return Convert.ToInt32(result);
+        }
+
+        public async Task<List<checkstastusapinew.Model.RiskRecord>> GetRisksByUsernameAsync(string username)
+        {
+            var results = new List<checkstastusapinew.Model.RiskRecord>();
+            var sql = "SELECT * FROM [dbo].[Risks] WHERE UserName = @username";
+            await using var conn = new Microsoft.Data.SqlClient.SqlConnection(_connectionString);
+            await using var cmd = new Microsoft.Data.SqlClient.SqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@username", username);
+            await conn.OpenAsync();
+            await using var rdr = await cmd.ExecuteReaderAsync();
+            while (await rdr.ReadAsync())
+            {
+                var record = new checkstastusapinew.Model.RiskRecord
+                {
+                    Id = rdr.GetInt32(rdr.GetOrdinal("Id")),
+                    RiskRegisterId = rdr["RiskRegisterId"] as int?,
+                    RiskCode = rdr["RiskCode"] as string,
+                    RiskName = rdr["RiskName"] as string,
+                    RiskDescription = rdr["RiskDescription"] as string,
+                    RiskCategory = rdr["RiskCategory"] as string,
+                    Directorate = rdr["Directorate"] as string,
+                    RiskOwner = rdr["RiskOwner"] as string,
+                    Region = rdr["Region"] as string,
+                    District = rdr["District"] as string,
+                    RegionId = rdr["RegionId"]?.ToString(),
+                    DistrictId = rdr["DistrictId"]?.ToString(),
+                    Landmark = rdr["Landmark"] as string,
+                    PhoneNumber = rdr["PhoneNumber"] as string,
+                    Frequency = rdr["Frequency"] as int?,
+                    FrequencyPeriod = rdr["FrequencyPeriod"] as string,
+                    Impact = rdr["Impact"] as int?,
+                    RiskScore = rdr["RiskScore"] as int?,
+                    UserId = rdr["UserId"] as int?,
+                    UserName = rdr["UserName"] as string,
+                    RiskChampionId = rdr["RiskChampionId"] as int?,
+                    ChampionAcknowledged = rdr["ChampionAcknowledged"] as int?,
+                    ChampionAcknowledgedDate = rdr["ChampionAcknowledgedDate"] as DateTime?,
+                    ChampionFeedback = rdr["ChampionFeedback"] as string,
+                    StaffAssignedId = rdr["StaffAssignedId"] as int?,
+                    StaffAssignedName = rdr["StaffAssignedName"] as string,
+                    StaffAcknowledged = rdr["StaffAcknowledged"] as int?,
+                    StaffAcknowledgedDate = rdr["StaffAcknowledgedDate"] as DateTime?,
+                    StaffFeedback = rdr["StaffFeedback"] as string,
+                    StaffCompleted = rdr["StaffCompleted"] as int?,
+                    StaffCompletedDate = rdr["StaffCompletedDate"] as DateTime?,
+                    StaffEvidenceUrls = rdr["StaffEvidenceUrls"] as string,
+                    StaffReturnedRiskDate = rdr["StaffReturnedRiskDate"] as DateTime?,
+                    CorporateChampionId = rdr["CorporateChampionId"] as int?,
+                    CorporateChampionName = rdr["CorporateChampionName"] as string,
+                    CorporateEscalatedDate = rdr["CorporateEscalatedDate"] as DateTime?,
+                    CorporateEscalationNote = rdr["CorporateEscalationNote"] as string,
+                    CorporateChampionComment = rdr["CorporateChampionComment"] as string,
+                    CorporateChampionCommentDate = rdr["CorporateChampionCommentDate"] as DateTime?,
+                    CorporateOwnerComment = rdr["CorporateOwnerComment"] as string,
+                    CorporateOwnerCommentDate = rdr["CorporateOwnerCommentDate"] as DateTime?,
+                    OwnerFeedback = rdr["OwnerFeedback"] as string,
+                    RegionalRepFeedback = rdr["RegionalRepFeedback"] as string,
+                    Status = rdr["Status"] as string,
+                    IsLocked = rdr["IsLocked"] as int?,
+                    ImageUrls = rdr["ImageUrls"] as string,
+                    MitigationNotes = rdr["MitigationNotes"] as string,
+                    CreatedDate = rdr["CreatedDate"] as DateTime?,
+                    UpdatedDate = rdr["UpdatedDate"] as DateTime?
+                };
+                results.Add(record);
+            }
+            return results;
         }
     }
 }

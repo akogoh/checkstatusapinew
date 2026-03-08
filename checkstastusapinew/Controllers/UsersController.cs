@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using checkstastusapinew.Services;
 using checkstastusapinew.Model;
+using System.IO;
 
 namespace checkstastusapinew.Controllers
 {
@@ -51,6 +52,7 @@ namespace checkstastusapinew.Controllers
                 return StatusCode(500, new { error = "Failed to query user", detail = ex.Message });
             }
         }
+
         // GET /api/riskdbusers/riskregister?page=1&pageSize=20
         [HttpGet("riskregister")]
         public async Task<IActionResult> GetRiskRegisterPage([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
@@ -67,9 +69,10 @@ namespace checkstastusapinew.Controllers
                 return StatusCode(500, new { error = "Failed to query risk register", detail = ex.Message });
             }
         }
+
         // POST /api/riskdbusers/risk
         [HttpPost("risk")]
-        public async Task<IActionResult> PostRisk([FromForm] checkstastusapinew.Model.RiskInputWithFileDto input)
+        public async Task<IActionResult> PostRisk([FromForm] RiskInputWithFileDto input)
         {
             if (string.IsNullOrWhiteSpace(input.Directorate))
                 return BadRequest("Directorate is required.");
@@ -119,6 +122,23 @@ namespace checkstastusapinew.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { success = false, error = ex.Message });
+            }
+        }
+
+        // GET /api/riskdbusers/myrisks?username=alice
+        [HttpGet("myrisks")]
+        public async Task<IActionResult> GetRisksByUsername([FromQuery] string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+                return BadRequest("username is required.");
+            try
+            {
+                var risks = await _db.GetRisksByUsernameAsync(username);
+                return Ok(risks);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Failed to query risks by username", detail = ex.Message });
             }
         }
     }
