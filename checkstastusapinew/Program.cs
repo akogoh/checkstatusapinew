@@ -47,6 +47,16 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
+// Serve static files from UploadedFiles directory (for image access)
+app.UseStaticFiles(new Microsoft.AspNetCore.Builder.StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+        @"c:\\Users\\gdakogoh\\source\\repos\\riskdashboardv2\\riskdashboardv2\\UploadedFiles"
+    ),
+    RequestPath = "/UploadedFiles"
+});
+
 app.UseHttpsRedirection();
 
 // Basic security headers

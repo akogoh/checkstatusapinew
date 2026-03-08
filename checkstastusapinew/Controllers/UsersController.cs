@@ -69,7 +69,7 @@ namespace checkstastusapinew.Controllers
         }
         // POST /api/riskdbusers/risk
         [HttpPost("risk")]
-        public async Task<IActionResult> PostRisk([FromForm] RiskInputModel input)
+        public async Task<IActionResult> PostRisk([FromForm] RiskInputModel input, [FromForm] Microsoft.AspNetCore.Http.IFormFile imageFile)
         {
             if (string.IsNullOrWhiteSpace(input.Directorate))
                 return BadRequest("Directorate is required.");
@@ -78,6 +78,22 @@ namespace checkstastusapinew.Controllers
 
             try
             {
+                // Handle image upload if present
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    var uploadsFolder = @"c:\\Users\\gdakogoh\\source\\repos\\riskdashboardv2\\riskdashboardv2\\UploadedFiles";
+                    if (!Directory.Exists(uploadsFolder))
+                        Directory.CreateDirectory(uploadsFolder);
+                    var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(stream);
+                    }
+                    // Set the ImageUrls property to the relative path for client access (adjust as needed)
+                    input.ImageUrls = $"/UploadedFiles/{uniqueFileName}";
+                }
+
                 var newId = await _db.InsertRiskAsync(
                     input.RiskRegisterId,
                     input.RiskName,
@@ -98,7 +114,7 @@ namespace checkstastusapinew.Controllers
                     input.UserName,
                     input.ImageUrls
                 );
-                return Ok(new { success = true, id = newId });
+                return Ok(new { success = true, id = newId, imageUrl = input.ImageUrls });
             }
             catch (Exception ex)
             {
