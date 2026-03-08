@@ -73,8 +73,8 @@ namespace checkstastusapinew.Controllers
         {
             if (string.IsNullOrWhiteSpace(input.Directorate))
                 return BadRequest("Directorate is required.");
-            if (input.RiskRegisterId == null && string.IsNullOrWhiteSpace(input.RiskName) && string.IsNullOrWhiteSpace(input.OtherRiskName))
-                return BadRequest("Either RiskRegisterId or RiskName/OtherRiskName is required.");
+            if (input.RiskRegisterId == null && string.IsNullOrWhiteSpace(input.RiskName))
+                return BadRequest("Either RiskRegisterId or RiskName is required.");
 
             try
             {
