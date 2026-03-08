@@ -81,19 +81,22 @@ namespace checkstastusapinew.Controllers
                 var newId = await _db.InsertRiskAsync(
                     input.RiskRegisterId,
                     input.RiskName,
-                    input.OtherRiskName,
                     input.RiskDescription,
                     input.RiskCategory,
                     input.Directorate,
                     input.RiskOwner,
+                    input.RiskChampionId,
+                    input.Frequency,
                     input.FrequencyPeriod,
-                    input.FrequencyScore,
                     input.Impact,
-                    input.InherentRiskScore,
+                    input.RiskScore,
                     input.Region,
                     input.District,
+                    input.PhoneNumber,
                     input.Landmark,
-                    input.PhoneNumber
+                    input.UserId,
+                    input.UserName,
+                    input.ImageUrls
                 );
                 return Ok(new { success = true, id = newId });
             }

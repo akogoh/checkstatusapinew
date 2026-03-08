@@ -119,42 +119,98 @@ namespace checkstastusapinew.Services
         public async Task<int> InsertRiskAsync(
             int? riskRegisterId,
             string riskName,
-            string otherRiskName,
             string riskDescription,
             string riskCategory,
             string directorate,
             string riskOwner,
+            int? riskChampionId,
+            int? frequency,
             string frequencyPeriod,
-            int? frequencyScore,
             int? impact,
-            int? inherentRiskScore,
+            int? riskScore,
             string region,
             string district,
+            string phoneNumber,
             string landmark,
-            string phoneNumber)
+            int? userId,
+            string userName,
+            string imageUrls
+        )
         {
-            var sql = @"INSERT INTO [dbo].[Risks]
-                (RiskRegisterId, RiskName, OtherRiskName, RiskDescription, RiskCategory, Directorate, RiskOwner, FrequencyPeriod, FrequencyScore, Impact, InherentRiskScore, Region, District, Landmark, PhoneNumber)
-                VALUES (@RiskRegisterId, @RiskName, @OtherRiskName, @RiskDescription, @RiskCategory, @Directorate, @RiskOwner, @FrequencyPeriod, @FrequencyScore, @Impact, @InherentRiskScore, @Region, @District, @Landmark, @PhoneNumber);
+            var sql = @"INSERT INTO dbo.Risks
+                (
+                    RiskRegisterId,
+                    RiskName,
+                    RiskDescription,
+                    RiskCategory,
+                    Directorate,
+                    RiskOwner,
+                    RiskChampionId,
+                    Frequency,
+                    FrequencyPeriod,
+                    Impact,
+                    RiskScore,
+                    RegionId,
+                    DistrictId,
+                    Region,
+                    District,
+                    PhoneNumber,
+                    Landmark,
+                    CreatedDate,
+                    Status,
+                    IsLocked,
+                    UserId,
+                    UserName,
+                    ImageUrls
+                )
+                VALUES
+                (
+                    @RiskRegisterId,
+                    @RiskName,
+                    @RiskDescription,
+                    @RiskCategory,
+                    @Directorate,
+                    @RiskOwner,
+                    @RiskChampionId,
+                    @Frequency,
+                    @FrequencyPeriod,
+                    @Impact,
+                    @RiskScore,
+                    '01',
+                    '01',
+                    @Region,
+                    @District,
+                    @PhoneNumber,
+                    @Landmark,
+                    GETDATE(),
+                    'New Risk',
+                    0,
+                    @UserId,
+                    @UserName,
+                    @ImageUrls
+                );
                 SELECT SCOPE_IDENTITY();";
 
             await using var conn = new SqlConnection(_connectionString);
             await using var cmd = new SqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@RiskRegisterId", (object?)riskRegisterId ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@RiskName", (object?)riskName ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@OtherRiskName", (object?)otherRiskName ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@RiskDescription", (object?)riskDescription ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@RiskCategory", (object?)riskCategory ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@Directorate", (object?)directorate ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@RiskOwner", (object?)riskOwner ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@RiskChampionId", (object?)riskChampionId ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@Frequency", (object?)frequency ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@FrequencyPeriod", (object?)frequencyPeriod ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@FrequencyScore", (object?)frequencyScore ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@Impact", (object?)impact ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@InherentRiskScore", (object?)inherentRiskScore ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@RiskScore", (object?)riskScore ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@Region", (object?)region ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@District", (object?)district ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@Landmark", (object?)landmark ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@PhoneNumber", (object?)phoneNumber ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@Landmark", (object?)landmark ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@UserId", (object?)userId ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@UserName", (object?)userName ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@ImageUrls", (object?)imageUrls ?? DBNull.Value);
 
             await conn.OpenAsync();
             var result = await cmd.ExecuteScalarAsync();
